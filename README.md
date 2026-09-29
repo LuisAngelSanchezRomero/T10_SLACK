@@ -85,3 +85,77 @@ Salida esperada:
 [INFO] BUILD SUCCESS
 [INFO] ------------------------------------------------------------------------
 ```
+
+## ✉️ Automatizacion con Jenkins
+```bash
+pipeline {
+    agent any
+
+    stages {
+        stage('1. Checkout SCM') {
+            steps {
+                echo '=== Descargando codigo fuente desde GitHub ==='
+                git branch: 'develop', url: 'https://github.com/LuisAngelSanchezRomero/T10_SLACK.git'
+            }
+        }
+
+        stage('2. Compilacion') {
+            steps {
+                echo '=== Compilando el proyecto de Gestion de Productos ==='
+                bat 'mvn clean compile'
+            }
+        }
+
+        stage('3. Pruebas Unitarias y Parametrizadas') {
+            steps {
+                echo '=== Ejecutando pruebas unitarias (JUnit 5 + Mockito) y parametrizadas (@ParameterizedTest) ==='
+                bat 'mvn test'
+            }
+        }
+    }
+
+    post {
+    success {
+        slackSend(
+            channel: '#jenkins',
+            color: 'good',
+            message: """ *BUILD SUCCESS* 
+            *Job:* ${env.JOB_NAME}
+            *Build:* #${env.BUILD_NUMBER}
+            *Resultado:* SUCCESS 
+            *Duración:* ${currentBuild.durationString}"""
+        )
+    }
+    failure {
+        slackSend(
+            channel: '#jenkins',
+            color: 'danger',
+            message: """ *BUILD FAILURE* 
+            *Job:* ${env.JOB_NAME}
+            *Build:* #${env.BUILD_NUMBER}
+            *Resultado:* FAILURE 
+            *Duración:* ${currentBuild.durationString}"""
+        )
+    }
+}
+
+}
+```
+
+Salida esperada:
+```text
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Declarative: Post Actions)
+[Pipeline] slackSend
+Slack Send Pipeline step running, values are - baseUrl: <empty>, teamDomain: pswt10, channel: #jenkins, color: good, botUser: false, tokenCredentialId: CredentialID, notifyCommitters: false, iconEmoji: <empty>, username: <empty>, timestamp: <empty>
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] }
+[Pipeline] // node
+[Pipeline] End of Pipeline
+Finished: SUCCESS
+```
+
+
