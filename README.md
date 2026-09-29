@@ -1,10 +1,10 @@
 # productos-ci
 
-Proyecto en Java + Maven con pruebas unitarias en JUnit 5 y automatización CI/CD con pipeline en Jenkins y notificaciones en Slack.
+Proyecto en Java + Maven con pruebas unitarias en JUnit 5 y automatización CI/CD con Pipeline en Jenkins y notificaciones en Slack en tiempo real.
 
 ---
 
-## 👥 Integrantes y roles
+## 👥 Integrantes y Roles
 
 | Integrante | Rol |
 |---|---|
@@ -34,128 +34,73 @@ productos-ci/
 ---
 
 ## 🛠️ Tecnologías Utilizadas
+
 * **Lenguaje:** Java 17 (LTS)
-* **Gestor de dependencias:** Maven 3.9+
-* **Framework de Pruebas:** JUnit Jupiter 5.10.2 (Unitarias y Parametrizadas)
-* **Integración Continua:** Jenkins (Pipeline Declarativo)
-* **Notificaciones:** Slack
+* **Gestor de Dependencias:** Maven 3.9+
+* **Framework de Pruebas:** JUnit Jupiter 5.10.2 (Pruebas Unitarias)
+* **Integración Continua (CI/CD):** Jenkins (Pipeline Declarativo)
+* **Notificaciones en Tiempo Real:** Slack
 
 ---
 
 ## 🧪 Matriz de Casos de Prueba (`ProductoTest.java`)
 
-| ID | Tipo | Caso de Prueba | Iteraciones | Resultado Esperado |
-|:---:|:---:|---|:---:|---|
-| **CP01** | Unitaria | Validar precio mayor a cero | 1 | Éxito (`assertTrue`) |
-| **CP02** | Parametrizada (`@ValueSource`) | Validar precios inválidos (0.0, -1.0, -50.0) | 3 | Lanza `IllegalArgumentException` |
-| **CP03** | Unitaria | Validar stock mayor o igual a cero | 1 | Éxito (`assertTrue`) |
-| **CP04** | Unitaria | Validar stock negativo (-5) | 1 | Lanza `IllegalArgumentException` |
-| **CP05** | Parametrizada (`@CsvSource`) | Calcular precio con descuentos (10%, 20%, 0%, 50%) | 4 | Precios calculados exactos |
-| **CP06** | Unitaria | Descuento fuera de rango (120%) | 1 | Lanza `IllegalArgumentException` |
-| **CP07** | Unitaria | Calcular precio con IGV (18%) | 1 | Total con impuesto calculado |
-| **CP08** | Unitaria | Envío gratis por monto >= S/ 100 | 1 | Retorna `true` |
-| **CP09** | Unitaria | Envío gratis por cantidad >= 5 unidades | 1 | Retorna `true` |
-| **CP10** | Unitaria | No califica a envío gratis (monto < 100 y cantidad < 5) | 1 | Retorna `false` |
+Se implementaron **5 casos de prueba unitarios** con JUnit 5 validando las reglas de negocio de la clase `Producto.java`:
 
-### 📊 Desglose Matemático de Ejecución:
-* **Casos de prueba diseñados:** 10 casos de prueba.
-* **Métodos `@Test` unitarios simples:** 8 métodos (8 ejecuciones).
-* **Métodos `@ParameterizedTest`:** 2 métodos con 7 ejecuciones (3 en CP02 + 4 en CP05).
-* **Total de pruebas ejecutadas en consola:** **15 pruebas (`Tests run: 15, Failures: 0, Errors: 0, Skipped: 0`)**.
+| ID | Tipo de Prueba | Descripción del Escenario | Iteraciones | Resultado Esperado |
+|:---:|:---:|---|:---:|---|
+| **CP01** | Unitaria (`@Test`) | Validar precio correcto mayor a cero (25.50) | 1 | Éxito (`assertTrue`) |
+| **CP02** | Unitaria (`@Test`) | Validar stock correcto mayor o igual a cero (10) | 1 | Éxito (`assertTrue`) |
+| **CP03** | Unitaria (`@Test`) | Calcular precio final con 10% de descuento aplicado | 1 | Retorna 90.0 (`assertEquals`) |
+| **CP04** | Unitaria (`@Test`) | Calcular precio con IGV del 18% (Base: 100 -> 118) | 1 | Retorna 118.0 (`assertEquals`) |
+| **CP05** | Unitaria (`@Test`) | Calificar a envío gratis por monto >= S/ 100 (150.0) | 1 | Retorna `true` (`assertTrue`) |
+
+### 📊 Resumen de Ejecución:
+* **Casos de prueba diseñados:** 5 casos de prueba unitarios.
+* **Métodos `@Test` ejecutados:** 5 métodos.
+* **Resultado en consola Surefire:** **`Tests run: 5, Failures: 0, Errors: 0, Skipped: 0`**.
 
 ---
 
-## 🚀 Ejecución de Pruebas en Maven
+## 🚀 Ejecución Local de Pruebas
+
+Para compilar y ejecutar las pruebas unitarias localmente:
 
 ```bash
 mvn clean test
 ```
 
-Salida esperada:
+### Salida esperada en terminal:
 ```text
-[INFO] -------------------------------------------------------
-[INFO]  T E S T S
-[INFO] -------------------------------------------------------
+[INFO] Scanning for projects...
+[INFO] ------------------< pe.edu.vallegrande:productos-ci >-------------------
+[INFO] Building Productos CI 1.0.0
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] --- clean:3.2.0:clean (default-clean) @ productos-ci ---
+[INFO] --- compiler:3.12.1:compile (default-compile) @ productos-ci ---
+[INFO] --- compiler:3.12.1:testCompile (default-testCompile) @ productos-ci ---
+[INFO] --- surefire:3.2.5:test (default-test) @ productos-ci ---
 [INFO] Running ProductoTest
-[INFO] Tests run: 15, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.170 s -- in ProductoTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.057 s -- in ProductoTest
 [INFO] 
 [INFO] Results:
-[INFO] Tests run: 15, Failures: 0, Errors: 0, Skipped: 0
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
 [INFO] ------------------------------------------------------------------------
 ```
 
-## ✉️ Automatizacion con Jenkins
-```bash
-pipeline {
-    agent any
+---
 
-    stages {
-        stage('1. Checkout SCM') {
-            steps {
-                echo '=== Descargando codigo fuente desde GitHub ==='
-                git branch: 'develop', url: 'https://github.com/LuisAngelSanchezRomero/T10_SLACK.git'
-            }
-        }
+## ⚙️ Automatización CI/CD con Jenkins
 
-        stage('2. Compilacion') {
-            steps {
-                echo '=== Compilando el proyecto de Gestion de Productos ==='
-                bat 'mvn clean compile'
-            }
-        }
+El archivo `Jenkinsfile` define un pipeline declarativo estructurado en tres etapas:
 
-        stage('3. Pruebas Unitarias y Parametrizadas') {
-            steps {
-                echo '=== Ejecutando pruebas unitarias (JUnit 5 + Mockito) y parametrizadas (@ParameterizedTest) ==='
-                bat 'mvn test'
-            }
-        }
-    }
+1. **Checkout:** Clona el código fuente desde el repositorio en GitHub (`T10_SLACK`).
+2. **Build:** Compila el proyecto mediante `mvn clean compile`.
+3. **Test:** Ejecuta la suite de pruebas unitarias mediante `mvn clean test`.
 
-    post {
-    success {
-        slackSend(
-            channel: '#jenkins',
-            color: 'good',
-            message: """ *BUILD SUCCESS* 
-            *Job:* ${env.JOB_NAME}
-            *Build:* #${env.BUILD_NUMBER}
-            *Resultado:* SUCCESS 
-            *Duración:* ${currentBuild.durationString}"""
-        )
-    }
-    failure {
-        slackSend(
-            channel: '#jenkins',
-            color: 'danger',
-            message: """ *BUILD FAILURE* 
-            *Job:* ${env.JOB_NAME}
-            *Build:* #${env.BUILD_NUMBER}
-            *Resultado:* FAILURE 
-            *Duración:* ${currentBuild.durationString}"""
-        )
-    }
-}
-
-}
-```
-
-Salida esperada:
-```text
-[Pipeline] }
-[Pipeline] // stage
-[Pipeline] stage
-[Pipeline] { (Declarative: Post Actions)
-[Pipeline] slackSend
-Slack Send Pipeline step running, values are - baseUrl: <empty>, teamDomain: pswt10, channel: #jenkins, color: good, botUser: false, tokenCredentialId: CredentialID, notifyCommitters: false, iconEmoji: <empty>, username: <empty>, timestamp: <empty>
-[Pipeline] }
-[Pipeline] // stage
-[Pipeline] }
-[Pipeline] // node
-[Pipeline] End of Pipeline
-Finished: SUCCESS
-```
-
-
+### Notificaciones Automáticas en Slack:
+* 🟢 **SUCCESS:** Envía alerta con resultado `BUILD SUCCESS` al canal de Slack.
+* 🔴 **FAILURE:** Envía alerta con resultado `BUILD FAILURE` en caso de fallos de compilación o aserción.
+* 🟢 **BACK TO NORMAL (Recuperado):** Envía alerta de recuperación validada cuando el pipeline vuelve a pasar exitosamente.
